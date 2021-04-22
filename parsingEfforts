@@ -1,0 +1,46 @@
+import pandas as pd
+import numpy as np 
+import nltk 
+from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA 
+import seaborn as sns 
+from IPython import display
+from pprint import pprint 
+import praw 
+import matplotlib.pyplot as plt 
+
+# Creating a Reddit object 
+
+reddit = praw.Reddit(
+    client_id="iLSwd99QUFJgUA",
+    client_secret="To0q5-Nj8aiV0-0w4eyxq3vfiWYJxw",
+    password="########",
+    user_agent="Testing_API",
+    username="#######",
+)
+print(reddit.user.me())
+
+target_sub = reddit.subreddit('SPACs')
+
+hot = target_sub.hot(limit = 100)
+new = target_sub.new(limit = 100)
+controv = target_sub.controversial(limit = 100)
+top = target_sub.top(limit = 100)
+gilded = target_sub.gilded(limit = 100)
+
+headlines = set() 
+for sub in target_sub.hot(limit = 100):
+    headlines.add(sub.title)
+
+scores_set = set()
+for sub in target_sub.hot(limit = 100):
+    scores_set.add(sub.score)
+
+sia = SIA()
+results = []
+for line in headlines: 
+    scores = sia.polarity_scores(line)
+    scores['headline'] = line 
+    results.append(scores) 
+for subScore in scores_set: 
+    results.append(subScore)
+
